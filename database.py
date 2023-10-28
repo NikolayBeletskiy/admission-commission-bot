@@ -10,14 +10,14 @@ class Exams:
             db.commit()
 
     @staticmethod
-    def read(id):
+    def read(id) -> tuple:
         with sqlite3.connect('commission.db') as db:
             cursor = db.cursor()
             cursor.execute(f"SELECT * FROM exams WHERE rowid = {id}")
             return cursor.fetchone()
 
     @staticmethod
-    def read_all():
+    def read_all() ->list[tuple]:
         with sqlite3.connect('commission.db') as db:
             cursor = db.cursor()
             cursor.execute(f"SELECT * FROM exams")
