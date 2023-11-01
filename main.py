@@ -2,6 +2,39 @@ import telebot
 import database
 from secret import token
 
+
+def get_exams_txt():
+    txt = ''
+    for i in database.Exams.read_all():
+        txt += f'{i[0]} - {i[1]}\n'
+    return txt
+
+
+def get_tests_txt(id):
+    speciality = database.Specialties.read(id)
+    return f"{speciality[1]} - {', '.join(speciality[2:])}"
+
+
+def get_points_of_specialities_txt(id):
+    txt = ''
+    for field in [i for i in database.Applications.read_all() if i[0] == id]:
+        speciality = database.Specialties.read(field[1])
+        txt += f'{speciality[1]} - {sum(field[2:])}\n'
+    return txt
+
+
+def get_points_of_subjects_txt(id):
+    txt = ''
+    subjects = {}
+    for field in [i for i in database.Applications.read_all() if i[0] == id]:
+        speciality = database.Specialties.read(field[1])
+        for i, v in zip(speciality[2:], field[2:]):
+            subjects[i] = v
+    for i in subjects:
+        txt += f"{i} - {subjects[i]}\n"
+    return txt
+
+
 bot = telebot.TeleBot(token)
 
 
@@ -30,9 +63,7 @@ def help_message(message):
 
 @bot.message_handler(commands=["расписание"])
 def exam_schedule(message):
-    txt = 'Расписание экзаменов\n'
-    for i in database.Exams.read_all():
-        txt += f'{i[0]} - {i[1]}\n'
+    txt = f'Расписание экзаменов\n{get_exams_txt()}'
     bot.send_message(message.chat.id, txt)
 
 
@@ -42,22 +73,20 @@ def entrance_tests(message):
     if id is None:
         return
 
-    speciality = database.Specialties.read(id)
-    txt = f"Вступительные испытания для специальности {speciality[1]} - {', '.join(speciality[2:])}"
+    txt = f"Вступительные испытания для специальности {get_tests_txt(id)}"
     bot.send_message(message.chat.id, txt)
 
 
 @bot.message_handler(commands=["студент"])
 def student(message):
     student_id = int(get_arguments(message)[0])
-    txt = 'сумма баллов по каждой специальности:\n'
-    print(student_id)
+    if student_id is None:
+        return
+    txt1 = f"оценки по предметам: \n{get_points_of_subjects_txt(student_id)}"
+    txt2 = f'сумма баллов по каждой специальности:\n{get_points_of_specialities_txt(student_id)}'
 
-    for field in [i for i in database.Applications.read_all() if i[0] == student_id]:
-        speciality = database.Specialties.read(field[1])[1]
-        txt += f'{speciality} - {sum(field[2:])}\n'
-
-    bot.send_message(message.chat.id, txt)
+    bot.send_message(message.chat.id, txt1)
+    bot.send_message(message.chat.id, txt2)
 
 
 print('бот запущен')
