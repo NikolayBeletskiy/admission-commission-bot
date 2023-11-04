@@ -81,4 +81,23 @@ class Applications:
         db.execute(f"DELETE FROM applications WHERE rowid = {id}")
 
 
+class Chats:
+    @staticmethod
+    def create(chat_id):
+        db.execute(f"INSERT INTO chats (chat_id) VALUES ({chat_id})")
 
+    @staticmethod
+    def read(id) -> tuple:
+        return db.select_one(f"SELECT * FROM chats WHERE chat_id = {id}")
+
+    @staticmethod
+    def read_all() -> list[tuple]:
+        return db.select(f"SELECT * FROM chats")
+
+    @staticmethod
+    def delete(id):
+        db.execute(f"DELETE FROM chats WHERE chat_id = {id}")
+
+    @staticmethod
+    def set_student_id(chat_id: int, student_id: int):
+        db.execute(f"UPDATE chats SET student_id ={student_id} WHERE chat_id={chat_id}")
