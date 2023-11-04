@@ -6,9 +6,9 @@ from secret import token
 
 def create_buttons():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    item1 = types.KeyboardButton("расписание")
-    item2 = types.KeyboardButton("студент")
-    item3 = types.KeyboardButton("испытания")
+    item1 = types.KeyboardButton("/расписание")
+    item2 = types.KeyboardButton("/студент")
+    item3 = types.KeyboardButton("/испытания")
     markup.add(item1)
     markup.add(item2)
     markup.add(item3)
